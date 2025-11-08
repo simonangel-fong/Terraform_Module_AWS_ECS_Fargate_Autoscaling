@@ -1,3 +1,3 @@
-output "subnets" {
-  value = module.demo_ecs.subnets
+output "lb_dns" {
+  value = module.demo_ecs.lb_dns
 }
