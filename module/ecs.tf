@@ -31,14 +31,18 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 # ECS: Capacity Provider
 # #################################
 resource "aws_ecs_cluster_capacity_providers" "ecs_cap" {
-  cluster_name = aws_ecs_cluster.ecs_cluster.name
-
-  capacity_providers = ["FARGATE"]
+  cluster_name       = aws_ecs_cluster.ecs_cluster.name
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
     capacity_provider = "FARGATE"
-    base              = 2
-    weight            = 100
+    base              = 1 # keep at least 1 on on-demand
+    weight            = 1
+  }
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 3 # ~75% of the remainder goes to spot
   }
 }
 
@@ -51,32 +55,32 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
   network_mode             = "awsvpc"
   cpu                      = var.ecs_task_cpu
   memory                   = var.ecs_task_memory
-  #   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-  container_definitions = jsonencode([
-    {
-      name      = "nginx"
-      image     = "nginx"
-      cpu       = 10
-      memory    = 512
-      essential = true
-      portMappings = [
-        {
-          containerPort = 80
-          hostPort      = 80
-        }
-      ]
-    }
-  ])
+  container_definitions = file(var.ecs_container_file)
+
+  # container_definitions = jsonencode([
+  #   {
+  #     name      = "nginx"
+  #     image     = "nginx"
+  #     cpu       = 10
+  #     memory    = 512
+  #     essential = true
+  #     portMappings = [
+  #       {
+  #         containerPort = 80
+  #         hostPort      = 80
+  #       }
+  #     ]
+  #   }
+  # ])
 }
 
 # #################################
 # ECS: Service
 # #################################
 resource "aws_ecs_service" "ecs_service" {
-  name        = "${var.project}-service"
-  cluster     = aws_ecs_cluster.ecs_cluster.id
-  launch_type = "FARGATE"
+  name    = "${var.project}-service"
+  cluster = aws_ecs_cluster.ecs_cluster.id
 
   # task
   task_definition = aws_ecs_task_definition.ecs_task_def.arn
@@ -90,16 +94,14 @@ resource "aws_ecs_service" "ecs_service" {
 
   load_balancer {
     target_group_arn = aws_alb_target_group.lb_tg.id
-    container_name   = var.ecs_container
+    container_name   = var.ecs_container_name
     container_port   = var.ecs_port
   }
 
-  # force_new_deployment = true
-  # capacity_provider_strategy {
-  #   capacity_provider = aws_ecs_cluster_capacity_providers.ecs_cap
-  #   base              = 1
-  #   weight            = 100
-  # }
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   depends_on = [aws_alb_listener.lb_lsn]
 }

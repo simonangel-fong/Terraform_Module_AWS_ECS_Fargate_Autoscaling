@@ -39,9 +39,10 @@ variable "vpc_subnet" {
 # ##############################
 # AWS ECS
 # ##############################
-variable "ecs_task_cpu" { default = 1024 }
-variable "ecs_task_memory" { default = 2048 }
+variable "ecs_task_cpu" { default = 256 }
+variable "ecs_task_memory" { default = 512 }
 variable "ecs_svc_desired" { default = 1 }
-variable "ecs_container" { default = "nginx" }
 variable "ecs_port" { default = "80" }
 variable "ecs_protocol" { default = "HTTP" }
+variable "ecs_container_name" { default = "nginx" }
+variable "ecs_container_file" { default = "./container.json" }
