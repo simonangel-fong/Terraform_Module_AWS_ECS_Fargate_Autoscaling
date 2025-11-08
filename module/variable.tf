@@ -13,3 +13,8 @@ variable "vpc_subnet" {
     az_suffix   = string
   }))
 }
+
+# ##############################
+# ECS
+# ##############################
+variable "ecs_name" { type = string }

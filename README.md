@@ -7,5 +7,5 @@ cd example
 terraform init -backend-config=backend.config
 terraform fmt && terraform validate
 
-terraform apply
+terraform apply -auto-approve
 ```

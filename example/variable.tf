@@ -29,3 +29,8 @@ variable "vpc_subnet" {
     }
   }
 }
+
+# ##############################
+# AWS ECS
+# ##############################
+variable "ecs_name" { default = "demo_ecs" }
