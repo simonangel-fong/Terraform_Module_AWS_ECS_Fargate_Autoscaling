@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 data "aws_acm_certificate" "cf_certificate" {
-  domain      = var.cert_domain
+  domain      = "*.${var.dns_domain}"
   provider    = aws.us_east_1
   types       = ["AMAZON_ISSUED"]
   most_recent = true
@@ -48,7 +48,7 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
 
   enabled             = true
   default_root_object = "index.html"
-  aliases             = ["${var.dns_domain}"]
+  aliases             = ["${var.project}.${var.dns_domain}"]
   price_class         = "PriceClass_100"
 
   viewer_certificate {

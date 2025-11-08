@@ -14,6 +14,5 @@ module "demo_ecs" {
   ecs_container_name = var.ecs_container_name
   ecs_container_file = var.ecs_container_file
   # cdn
-  dns_domain  = var.dns_domain
-  cert_domain = var.cert_domain
+  dns_domain = var.dns_domain
 }

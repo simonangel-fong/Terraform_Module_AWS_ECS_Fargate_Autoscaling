@@ -9,6 +9,12 @@ variable "project" { default = "demo-fargate" }
 variable "aws_region" { type = string }
 
 # ##############################
+# Cloudflare
+# ##############################
+variable "cloudflare_api_token" { type = string }
+variable "cloudflare_zone_id" { type = string }
+
+# ##############################
 # AWS VPC
 # ##############################
 variable "vpc_cidr" {
@@ -47,9 +53,7 @@ variable "ecs_protocol" { default = "HTTP" }
 variable "ecs_container_name" { default = "nginx" }
 variable "ecs_container_file" { default = "./container.json" }
 
-
 # ##############################
 # AWS CloudFront
 # ##############################
-variable "dns_domain" { default = "ecs.arguswatcher.net" }
-variable "cert_domain" { default = "*.arguswatcher.net" }
+variable "dns_domain" { default = "arguswatcher.net" }

@@ -44,4 +44,3 @@ variable "ecs_protocol" { type = string }
 # AWS CloudFront
 # ##############################
 variable "dns_domain" { type = string }
-variable "cert_domain" { type = string }

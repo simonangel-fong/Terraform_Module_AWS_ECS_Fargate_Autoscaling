@@ -8,7 +8,7 @@ terraform fmt && terraform validate
 
 terraform apply -auto-approve
 # Outputs:
-# lb_dns = "demo-fargate-lb-438473572.ca-central-1.elb.amazonaws.com:80"
+# cdn_domain = "d19tn7iec1lu1l.cloudfront.net"
 
 terraform delete -auto-approve
 ```
@@ -19,8 +19,5 @@ terraform delete -auto-approve
 cd testing
 docker build -t k6 .
 
-docker run --rm --name k6_con --net=host -p 5665:5665 -e MAX=3000 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=http://demo-fargate-lb-438473572.ca-central-1.elb.amazonaws.com:80 -v ./:/app k6 run local_load.js
+docker run --rm --name k6_con --net=host -p 5665:5665 -e MAX=3000 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=http://d19tn7iec1lu1l.cloudfront.net -v ./:/app k6 run local_load.js
 ```
-
-docker run -d --name oltp_fastapi -p 8000:8000 simonangelfong/toronto-shared-bike-oltp-fastapi:v0.1-dev
-docker rm -f oltp_fastapi
