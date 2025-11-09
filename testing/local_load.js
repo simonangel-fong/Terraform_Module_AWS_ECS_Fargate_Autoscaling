@@ -3,6 +3,7 @@ import { check, sleep } from "k6";
 
 const BASE_URL = __ENV.BASE_URL || "http://127.0.0.1:8080";
 
+const DURATION = __ENV.DURATION || 60;
 const MAX = __ENV.MAX || 300;
 const AVG = 100;
 
@@ -20,7 +21,7 @@ export const options = {
       executor: "ramping-vus",
       stages: [
         { duration: "30s", target: MAX },
-        { duration: "120s", target: MAX },
+        { duration: `${DURATION}s`, target: MAX },
         { duration: "30s", target: 0 },
       ],
     },

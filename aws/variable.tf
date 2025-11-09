@@ -47,10 +47,10 @@ variable "vpc_subnet" {
 # ##############################
 variable "ecs_task_cpu" { default = 256 }
 variable "ecs_task_memory" { default = 512 }
-variable "ecs_svc_desired" { default = 1 }
+variable "ecs_svc_desired" { default = 2 }
 variable "ecs_port" { default = "80" }
 variable "ecs_protocol" { default = "HTTP" }
-variable "ecs_container_name" { default = "nginx" }
+variable "ecs_container_name" { default = "fastapi" }
 variable "ecs_container_file" { default = "./container.json" }
 
 # ##############################

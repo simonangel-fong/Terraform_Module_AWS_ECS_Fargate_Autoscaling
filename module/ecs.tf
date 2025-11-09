@@ -27,24 +27,24 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.project}-ecs-cluster"
 }
 
-# #################################
-# ECS: Capacity Provider
-# #################################
-resource "aws_ecs_cluster_capacity_providers" "ecs_cap" {
-  cluster_name       = aws_ecs_cluster.ecs_cluster.name
-  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+# # #################################
+# # ECS: Capacity Provider
+# # #################################
+# resource "aws_ecs_cluster_capacity_providers" "ecs_cap" {
+#   cluster_name       = aws_ecs_cluster.ecs_cluster.name
+#   capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE"
-    base              = 1 # keep at least 1 on on-demand
-    weight            = 1
-  }
+#   default_capacity_provider_strategy {
+#     capacity_provider = "FARGATE"
+#     base              = 1 # keep at least 1 on on-demand
+#     weight            = 1
+#   }
 
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
-    weight            = 3 # ~75% of the remainder goes to spot
-  }
-}
+#   default_capacity_provider_strategy {
+#     capacity_provider = "FARGATE_SPOT"
+#     weight            = 3 # ~75% of the remainder goes to spot
+#   }
+# }
 
 # #################################
 # ECS: Task Definition
@@ -110,5 +110,55 @@ resource "aws_ecs_service" "ecs_service" {
     base              = 1
   }
 
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
+
   depends_on = [aws_alb_listener.lb_lsn]
+}
+
+resource "aws_appautoscaling_target" "scaling_target" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = 1
+  max_capacity       = 10
+}
+
+resource "aws_appautoscaling_policy" "scaling_down" {
+  name               = "${var.project}-scale-down"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.scaling_target.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = -1
+    }
+  }
+}
+
+resource "aws_appautoscaling_policy" "scaling_up" {
+  name               = "${var.project}-scale-up"
+  policy_type        = "StepScaling"
+  resource_id        = aws_appautoscaling_target.scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.scaling_target.service_namespace
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 60
+    metric_aggregation_type = "Maximum"
+
+    step_adjustment {
+      metric_interval_upper_bound = 0
+      scaling_adjustment          = 1
+    }
+  }
 }

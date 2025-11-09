@@ -47,7 +47,6 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
   }
 
   enabled             = true
-  default_root_object = "index.html"
   aliases             = ["${var.project}.${var.dns_domain}"]
   price_class         = "PriceClass_100"
 
