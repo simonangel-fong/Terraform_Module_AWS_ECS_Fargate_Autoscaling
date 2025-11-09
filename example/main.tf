@@ -16,3 +16,7 @@ module "demo_ecs" {
   # cdn
   dns_domain = var.dns_domain
 }
+
+output "cdn_domain" {
+  value = module.demo_ecs.cdn_domain
+}
