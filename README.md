@@ -39,5 +39,5 @@ terraform delete -auto-approve
 cd testing
 docker build -t k6 .
 
-docker run --rm --name k6_con --net=host -p 5665:5665 -e MAX=1500 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=https://demo-fargate.arguswatcher.net/ -e DURATION=60 -v ./:/app k6 run local_load.js
+docker run --rm --name k6_con --net=host -p 5665:5665 -e MAX=2000 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=https://demo-fargate.arguswatcher.net/ -e DURATION=60 -v ./:/app k6 run local_load.js
 ```
