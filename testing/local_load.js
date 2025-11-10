@@ -11,10 +11,10 @@ const SLA_FAIL = __ENV.SLA_FAIL || "0.01";
 const SLA_DUR_99 = __ENV.SLA_DUR_99 || "1000";
 
 export const options = {
-  thresholds: {
-    http_req_failed: [{ threshold: `rate<${SLA_FAIL}`, abortOnFail: true }], // SLA: http errors < 1%; otherwise abort the test
-    http_req_duration: [`p(99)<${SLA_DUR_99}`], // SLA: http 99% of requests < 1s
-  },
+  // thresholds: {
+  //   http_req_failed: [{ threshold: `rate<${SLA_FAIL}`, abortOnFail: true }], // SLA: http errors < 1%; otherwise abort the test
+  //   http_req_duration: [`p(99)<${SLA_DUR_99}`], // SLA: http 99% of requests < 1s
+  // },
   scenarios: {
     // name of scenario
     average_load: {

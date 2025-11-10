@@ -122,8 +122,26 @@ resource "aws_appautoscaling_policy" "scaling_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value       = 60
-    scale_in_cooldown  = 60
-    scale_out_cooldown = 60
+    target_value       = 60 # cpu%
+    scale_in_cooldown  = 30
+    scale_out_cooldown = 30
+  }
+}
+
+resource "aws_appautoscaling_policy" "scaling_memory" {
+  name               = "${var.project}-scale-memory"
+  resource_id        = aws_appautoscaling_target.scaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.scaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.scaling_target.service_namespace
+  policy_type        = "PredictiveScaling"
+
+  predictive_scaling_policy_configuration {
+    metric_specification {
+      target_value = 40  # memory %
+
+      predefined_metric_pair_specification {
+        predefined_metric_type = "ECSServiceMemoryUtilization"
+      }
+    }
   }
 }
