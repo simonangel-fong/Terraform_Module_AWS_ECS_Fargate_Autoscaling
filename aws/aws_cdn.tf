@@ -46,9 +46,9 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
     }
   }
 
-  enabled             = true
-  aliases             = ["${var.project}.${var.dns_domain}"]
-  price_class         = "PriceClass_100"
+  enabled     = true
+  aliases     = ["${var.project}.${var.dns_domain}"]
+  price_class = "PriceClass_100"
 
   viewer_certificate {
     acm_certificate_arn      = data.aws_acm_certificate.cf_certificate.arn

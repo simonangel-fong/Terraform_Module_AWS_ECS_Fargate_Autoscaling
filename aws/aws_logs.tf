@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "/aws/ecs/${var.project}"
-  retention_in_days = 30
+  retention_in_days = 7
 
   tags = {
     Name = "${var.project}-log-group"

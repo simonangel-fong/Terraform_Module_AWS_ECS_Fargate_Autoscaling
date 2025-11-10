@@ -1,18 +1,14 @@
 # ##############################
 # APP
 # ##############################
-variable "project" { default = "demo-fargate" }
+variable "project" { default = "demo-ecs-autoscaling" }
 
 # ##############################
-# AWS
+# provider
 # ##############################
 variable "aws_region" { type = string }
-
-# ##############################
-# Cloudflare
-# ##############################
-variable "cloudflare_api_token" { type = string }
 variable "cloudflare_zone_id" { type = string }
+variable "cloudflare_api_token" { type = string }
 
 # ##############################
 # AWS VPC
@@ -42,18 +38,4 @@ variable "vpc_subnet" {
   }
 }
 
-# ##############################
-# AWS ECS
-# ##############################
-variable "ecs_task_cpu" { default = 256 }
-variable "ecs_task_memory" { default = 512 }
-variable "ecs_svc_desired" { default = 1 }
-variable "ecs_port" { default = "80" }
-variable "ecs_protocol" { default = "HTTP" }
-variable "ecs_container_name" { default = "fastapi" }
-variable "ecs_container_file" { default = "./container.json" }
-
-# ##############################
-# AWS CloudFront
-# ##############################
 variable "dns_domain" { default = "arguswatcher.net" }
