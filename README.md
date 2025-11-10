@@ -39,5 +39,9 @@ terraform delete -auto-approve
 cd testing
 docker build -t k6 .
 
-docker run --rm --name k6_con --net=host -p 5665:5665 -e MAX=1000 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=https://demo-ecs-autoscaling.arguswatcher.net/ -e DURATION=600 -v ./:/app k6 run local_load.js
+# cloud
+docker run --rm --name k6_con --env-file ./.env -e MAX=100 -e BASE_URL=https://demo-ecs-autoscaling.arguswatcher.net/ -v ./:/app k6 cloud run --include-system-env-vars=true local_load.js
+
+# local
+docker run --rm --name k6_con --net=host -e MAX=2000 -e K6_WEB_DASHBOARD=true -e K6_WEB_DASHBOARD_EXPORT=load.html -e BASE_URL=https://demo-ecs-autoscaling.arguswatcher.net/ -e DURATION=600 -v ./:/app k6 run local_load.js
 ```

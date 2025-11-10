@@ -5,6 +5,25 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.project}-ecs-cluster"
 }
 
+# #################################
+# ECS: Capacity Provider
+# #################################
+resource "aws_ecs_cluster_capacity_providers" "ecs_cap" {
+  cluster_name       = aws_ecs_cluster.ecs_cluster.name
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    base              = 1 # keep at least 1 on on-demand
+    weight            = 1
+  }
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 3 # ~75% of the remainder goes to spot
+  }
+}
+
 ###############################################
 # Task IAM Roles: ECS Task Execution
 ###############################################
@@ -57,7 +76,7 @@ resource "aws_security_group" "ecs_task_sg" {
 }
 
 # #################################
-# ECS: Task Definition
+# Task Definition
 # #################################
 resource "aws_ecs_task_definition" "ecs_task_def" {
   family                   = "${var.project}-task-definition"
@@ -71,7 +90,7 @@ resource "aws_ecs_task_definition" "ecs_task_def" {
 }
 
 # #################################
-# ECS: Service
+# Service
 # #################################
 resource "aws_ecs_service" "ecs_service" {
   name    = "${var.project}-svc"
@@ -108,9 +127,10 @@ resource "aws_appautoscaling_target" "scaling_target" {
   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   min_capacity       = 1
-  max_capacity       = 10
+  max_capacity       = 20
 }
 
+# scaling policy: cpu
 resource "aws_appautoscaling_policy" "scaling_cpu" {
   name               = "${var.project}-scale-cpu"
   resource_id        = aws_appautoscaling_target.scaling_target.resource_id
@@ -122,7 +142,7 @@ resource "aws_appautoscaling_policy" "scaling_cpu" {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value       = 60 # cpu%
+    target_value       = 40 # cpu%
     scale_in_cooldown  = 30
     scale_out_cooldown = 30
   }
@@ -137,11 +157,11 @@ resource "aws_appautoscaling_policy" "scaling_memory" {
 
   predictive_scaling_policy_configuration {
     metric_specification {
-      target_value = 40  # memory %
-
       predefined_metric_pair_specification {
         predefined_metric_type = "ECSServiceMemoryUtilization"
       }
+
+      target_value = 40 # memory %
     }
   }
 }
