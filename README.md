@@ -1,4 +1,4 @@
-# Terraform Module: Amazon ECS Fargate Autoscaling
+# Terraform Demo: Amazon ECS(Fargate) Autoscaling
 
 ## FastAPI & Image
 
